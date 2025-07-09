@@ -17,4 +17,4 @@ More info on statistical scraping [here](https://github.com/SNStatComp/SSIG)
 - Find your output in the configured output directory     
 
 # Other info
-This code further works on the prototype developed during a meeting in Lissabon for [AIML4OS WP12](https://github.com/AIML4OS/WP12/tree/main/wp12_hackathon), 
+This code further works on the prototype developed during a meeting in Lisbon for [AIML4OS WP12](https://github.com/AIML4OS/WP12/tree/main/wp12_hackathon), 
