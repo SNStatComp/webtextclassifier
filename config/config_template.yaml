@@ -7,10 +7,16 @@ aws:
   session_token: 
   default_region: 
 llm:
+  method:
   api_key:
+  model: 
+  base_url: 
+requests:
+  timeout: 5
+  default_language: English
 input:
-  input_dir:
+  input_dir: input
   input_file:
   input_variables:
 output:
-  output_dir: 
+  output_dir: output

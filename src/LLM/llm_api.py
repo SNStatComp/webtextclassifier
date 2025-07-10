@@ -1,8 +1,7 @@
 import openai
 
 
-def LLM_API(config, variable, message_content=""):
-
+def prompt_LLM(config, variable, message_content=""):
     client = openai.OpenAI(
         api_key=config.llm.api_key,
         base_url=config.llm.base_url

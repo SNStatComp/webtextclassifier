@@ -2,17 +2,17 @@ import requests
 import justext
 
 
-def extract_text(url, country):
+def extract_text(config, url, country):
     try:
-        response = requests.get(url, timeout=5)
-    except:
-        raise Exception(f"Could not request url: {url}")
+        response = requests.get(url, timeout=config.requests.timeout)
+    except Exception as e:
+        raise Exception(f"Could not request url: {url}, error: {e}")
 
     if not (response.status_code >= 200 and response.status_code < 400):
         return ""
 
     # TODO determine language by text content rather than domain
-    language = "English"
+    language = config.requests.default_language
     if country == "DE":
         language = "German"
     elif country == "NL":

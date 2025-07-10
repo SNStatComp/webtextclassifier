@@ -5,12 +5,17 @@ import s3fs
 import json
 import random
 import pandas as pd
-from util import setup, classify, extract_text
+from omegaconf import OmegaConf
+from util import setup, extract_text
+from LLM import classify
 from datetime import datetime
 
 
 def main():
     config = setup("config/config.yaml")
+
+    print("Config:")
+    print(OmegaConf.to_yaml(config))
 
     # Create filesystem object
     fs = s3fs.S3FileSystem(
@@ -34,8 +39,8 @@ def main():
     url_country = list(zip(url_data['url'], url_data['country']))
     random.shuffle(url_country)
 
-    # N = 10  # Sample size of list
-    # url_country = url_country[:N]
+    N = 10  # Sample size of list
+    url_country = url_country[:N]
 
     for var in variables:
         output = {}
@@ -44,8 +49,8 @@ def main():
             url, country = uc_tuple
             print(f"url {i + 1}/{len(url_country)}: {url}")
             try:
-                extracted_text = extract_text(url, country)
-            except:
+                extracted_text = extract_text(config, url, country)
+            except Exception as e:
                 continue
 
             if len(extracted_text) < 1:
@@ -58,6 +63,8 @@ def main():
         print("# times LLM output exceeded specified maximum length")
         print(len([v for v in output.values() if len(v) > 3]))
         print(f"Total items: {len(output)}/{len(url_country)}")
+
+        print(output)
 
         with open(f"{config.output.output_dir}/output_{var.replace(" ", "_").lower()}_{datetime.now().strftime("%m_%d_%Y_%H_%M_%S")}.json", "w") as fp:
             json.dump(output, fp)
