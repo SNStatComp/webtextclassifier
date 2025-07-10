@@ -1,7 +1,6 @@
 filesystem:
   endpoint: 
   bucket: 
-  file_key: 
 aws:
   access_key: 
   secret_access_key: 
@@ -9,5 +8,9 @@ aws:
   default_region: 
 llm:
   api_key:
+input:
+  input_dir:
+  input_file:
+  input_variables:
 output:
   output_dir: 
