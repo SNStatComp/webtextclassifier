@@ -8,5 +8,5 @@ def setup(config_path):
 
     # Set OS environment variables or other stuff...
     # ...
-    
+
     return config
