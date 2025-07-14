@@ -8,6 +8,8 @@ aws:
   default_region: 
 llm:
   method:
+  embedding:
+    dim: 
   api_key:
   model: 
   base_url: 
