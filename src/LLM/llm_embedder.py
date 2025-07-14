@@ -1,8 +1,10 @@
 from sentence_transformers import SentenceTransformer
 
 
-def embed_sentence_transformer(config, text):
-    # TODO can probably make this more efficient by instantiating model once/passing text in parallel
+def create_model(config):
     model = SentenceTransformer(config.llm.model)
+    return model
 
+
+def embed_text(model, text):
     return model.encode(text)
