@@ -1,13 +1,12 @@
-import requests
-import justext
-import os
 import s3fs
 import json
 import random
 import pandas as pd
+import numpy as np
 from omegaconf import OmegaConf
 from util import setup, extract_text
-from LLM import classify
+from LLM import classify, create_model
+from sklearn.linear_model import LogisticRegression
 from datetime import datetime
 
 
@@ -20,9 +19,9 @@ def main():
     # Create filesystem object
     fs = s3fs.S3FileSystem(
         client_kwargs={'endpoint_url': config.filesystem.endpoint},
-        key = config.aws.access_key,
-        secret = config.aws.secret_access_key,
-        token = config.aws.session_token
+        key=config.aws.access_key,
+        secret=config.aws.secret_access_key,
+        token=config.aws.session_token
     )
     BUCKET = config.filesystem.bucket
     FILE_KEY_S3 = config.input.input_file
@@ -42,6 +41,18 @@ def main():
     N = 10  # Sample size of list
     url_country = url_country[:N]
 
+    models = None
+    if config.llm.method == "embedding":
+        model_embed = create_model(config)
+
+        # TODO replace with code to read model config/load in pre-trained model
+        model_class = LogisticRegression(max_iter=0)
+        model_class.fit(np.random.rand(2, config.llm.embedding.dim), [0, 1])
+        models = {
+            "embed": model_embed,
+            "class": model_class
+        }
+
     for var in variables:
         output = {}
         print("Variable:", var)
@@ -51,17 +62,18 @@ def main():
             try:
                 extracted_text = extract_text(config, url, country)
             except Exception as e:
+                print(e)
                 continue
 
             if len(extracted_text) < 1:
                 # print(f"Issue extracting text for url: {url}, language: {language}")
                 continue
             
-            response = classify(config, extracted_text)
+            response = classify(config, extracted_text, models)
             output[url] = response
 
-        print("# times LLM output exceeded specified maximum length")
-        print(len([v for v in output.values() if len(v) > 3]))
+        # print("# times LLM output exceeded specified maximum length")
+        # print(len([v for v in output.values() if len(v) > 3]))
         print(f"Total items: {len(output)}/{len(url_country)}")
 
         print(output)
