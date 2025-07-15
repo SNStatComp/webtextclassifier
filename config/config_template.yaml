@@ -7,14 +7,15 @@ aws:
   session_token: 
   default_region: 
 llm:
+  model: 
   method:
+  api:
+    key:
+    url:
   embedding:
     dim: 
-  api_key:
-  model: 
-  base_url: 
 requests:
-  timeout: 5
+  timeout: 5 # In seconds 
   default_language: English
 input:
   input_dir: input

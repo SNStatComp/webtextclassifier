@@ -8,7 +8,6 @@ More info on statistical scraping [here](https://github.com/SNStatComp/SSIG)
 # Getting started
 - Install all required packages using 
     > pip install -r requirements.txt
-
 - Create a `config.yaml` file using `config_template.yaml`
 - Place your input file with URLs according to your input configuration
 - Configure your variables in the configured input file
@@ -17,4 +16,4 @@ More info on statistical scraping [here](https://github.com/SNStatComp/SSIG)
 - Find your output in the configured output directory     
 
 # Other info
-This code further works on the prototype developed during a meeting in Lisbon for [AIML4OS WP12](https://github.com/AIML4OS/WP12/tree/main/wp12_hackathon), 
+This repository develops on the prototype created during a meeting in Lisbon for [AIML4OS WP12](https://github.com/AIML4OS/WP12/tree/main/wp12_hackathon), 

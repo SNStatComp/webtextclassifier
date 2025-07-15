@@ -16,6 +16,7 @@ def main():
     print("Config:")
     print(OmegaConf.to_yaml(config))
 
+    # TODO this assumes the use of Onyxia, change later to something more generic to read input file and variables
     # Create filesystem object
     fs = s3fs.S3FileSystem(
         client_kwargs={'endpoint_url': config.filesystem.endpoint},
@@ -38,6 +39,7 @@ def main():
     url_country = list(zip(url_data['url'], url_data['country']))
     random.shuffle(url_country)
 
+    # Only used for testing on a small sample to speed things up
     N = 10  # Sample size of list
     url_country = url_country[:N]
 
@@ -68,7 +70,7 @@ def main():
             if len(extracted_text) < 1:
                 # print(f"Issue extracting text for url: {url}, language: {language}")
                 continue
-            
+
             response = classify(config, extracted_text, models)
             output[url] = response
 
