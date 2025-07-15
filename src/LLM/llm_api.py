@@ -3,8 +3,8 @@ import openai
 
 def prompt_LLM(config, variable, message_content=""):
     client = openai.OpenAI(
-        api_key=config.llm.api_key,
-        base_url=config.llm.base_url
+        api_key=config.llm.api.key,
+        base_url=config.llm.api.url
     )
 
     prompt_content = f"{message_content}, does the above-mentioned text, relating to a web-page, contain text with its main content about: {variable}?"
