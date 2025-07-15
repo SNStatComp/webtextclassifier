@@ -1,13 +1,13 @@
 import openai
 
 
-def prompt_LLM(config, variable, message_content=""):
+def prompt_LLM(config, extracted_text="", variable=None):
     client = openai.OpenAI(
         api_key=config.llm.api.key,
         base_url=config.llm.api.url
     )
 
-    prompt_content = f"{message_content}, does the above-mentioned text, relating to a web-page, contain text with its main content about: {variable}?"
+    prompt_content = f"{extracted_text}, does the above-mentioned text, relating to a web-page, contain text with its main content about: {variable}?"
 
     response = client.chat.completions.create(
         model = config.llm.model,
