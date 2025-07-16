@@ -12,6 +12,8 @@ from datetime import datetime
 
 def main():
     config = setup("config/config.yaml")
+    if config.seed is not None:
+        random.seed(config.seed)
 
     print("Config:")
     print(OmegaConf.to_yaml(config))
@@ -39,8 +41,11 @@ def main():
     url_country = list(zip(url_data['url'], url_data['country']))
     random.shuffle(url_country)
 
+    # For now, only use dutch websites
+    url_country = [(url, country) for (url, country) in url_country if country == "NL"]
+
     # Only used for testing on a small sample to speed things up
-    N = 10  # Sample size of list
+    N = 100  # Sample size of list
     url_country = url_country[:N]
 
     models = None
@@ -58,22 +63,43 @@ def main():
     for var in variables:
         output = {}
         print("Variable:", var)
+        urls = []
+        texts = []
+        labels = []
         for i, uc_tuple in enumerate(url_country):
             url, country = uc_tuple
+
+            urls.append(url)
             print(f"url {i + 1}/{len(url_country)}: {url}")
             try:
                 extracted_text = extract_text(config, url, country)
             except Exception as e:
+                texts.append("")
+                labels.append("-1")
                 print(e)
                 continue
 
             if len(extracted_text) < 1:
                 # print(f"Issue extracting text for url: {url}, language: {language}")
+                texts.append("")
+                labels.append("-1")
                 continue
 
-            response = classify(config, extracted_text, models)
+            texts.append(extracted_text)
+            response = classify(config, extracted_text, var, models)
+            labels.append(response)
             output[url] = response
 
+        df_dict = {
+            "url": urls,
+            "text": texts,
+            "label": labels
+        }
+
+        df = pd.DataFrame(data=df_dict)
+        df = df[df["label"] != "-1"]
+        df.to_parquet(f"output_trial_{var}_{config.llm.method}.parquet", index=False)
+        print("# of 1s:", sum((df["label"]).astype(int)))
         # print("# times LLM output exceeded specified maximum length")
         # print(len([v for v in output.values() if len(v) > 3]))
         print(f"Total items: {len(output)}/{len(url_country)}")

@@ -7,12 +7,13 @@ aws:
   session_token: 
   default_region: 
 llm:
-  model: 
   method:
-  api:
-    key:
+  prompt:
+    model:
+    api_key:
     url:
   embedding:
+    model:
     dim: 
 requests:
   timeout: 5 # In seconds 
@@ -23,3 +24,4 @@ input:
   input_variables:
 output:
   output_dir: output
+seed: 

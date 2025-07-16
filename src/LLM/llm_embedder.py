@@ -2,7 +2,7 @@ from sentence_transformers import SentenceTransformer
 
 
 def create_model(config):
-    model = SentenceTransformer(config.llm.model)
+    model = SentenceTransformer(config.llm.embedding.model)
     return model
 
 
