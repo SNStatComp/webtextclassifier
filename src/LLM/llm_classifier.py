@@ -4,7 +4,7 @@ from .llm_embedder import embed_text
 
 def classify_prompt(config, extracted_text, variable):
     # For now, just prompt the llm
-    return prompt_LLM(config, extracted_text, variable)
+    return 1 if prompt_LLM(config, extracted_text, variable) == "Yes" else 0
 
 
 # TODO restructure code to process in batches
