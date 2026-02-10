@@ -1,5 +1,23 @@
-from .llm_api import prompt_LLM
+from .llm_prompter import prompt_LLM
 from .llm_embedder import embed_text
+import warnings
+from sklearn.tree import DecisionTreeClassifier
+import joblib
+
+
+def create_classification_model(config, pretrained=True):
+    match config.llm.embedding.classifier:
+        case "DecisionTree":
+            model = DecisionTreeClassifier()
+            if pretrained:
+                # We use joblib for loading pkls
+                model = joblib.load(config.llm.embedding.classifier_path)
+                print(f"Loaded weights for {config.llm.embedding.classifier} classifier")
+            else:
+                model = DecisionTreeClassifier()
+            return model
+        case _:
+            warnings.warn(f"TODO! {config.llm.embedding.classifier} not yet supported")
 
 
 def classify_prompt(config, extracted_text, variable):
@@ -8,19 +26,7 @@ def classify_prompt(config, extracted_text, variable):
 
 
 # TODO restructure code to process in batches
-def classify_embedding(config, extracted_text, variable, models):
-    embedding = embed_text(models["embed"], extracted_text, variable).reshape(1, config.llm.embedding.dim)
-    prediction = models["class"].predict(embedding)
-
-    # TODO remove conversion/work with batched output
-    return str(prediction[0])
-
-
-def classify(config, extracted_text, variable, models=None):
-    match config.llm.method:
-        case "prompt":
-            return classify_prompt(config, extracted_text, variable)
-        case "embedding":
-            return classify_embedding(config, extracted_text, variable, models)
-        case _:
-            raise Exception(f"Unspecified method for classification: {config.llm.method}")
+def classify_embedding(config, extracted_text, models):
+    embedding = embed_text(models["embedding"], extracted_text)
+    prediction = models["classification"].predict(embedding)
+    return prediction
