@@ -33,11 +33,9 @@ def main():
         models["embedding"] = create_model(config, "embedder")
         models["classification"] = create_model(config, "classifier")
 
-    # print("models:", models)
-    print("-" * 33, "CLASSIFICATION (WITH EMBEDDING)", "-" * 33)
-    # Classification (with embedding in this case)
-    print("Start embedding and classification...")
-
+    print("-" * 33, f"CLASSIFICATION ({config.llm.method})", "-" * 33)
+    
+    # Classification
     df["OJA_label"] = classify(config, df["text"], models=models)
     print("-" * 33, "SAVE RESULTS", "-" * 33)
     # Save results in parquet
