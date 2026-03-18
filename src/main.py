@@ -28,7 +28,6 @@ def main():
     print("-" * 33, "LOADING IN DATA", "-" * 33)
     # TODO lazy reading to deal with large dataset 
     df = pd.read_parquet(os.path.join(config.input.input_dir, config.input.input_file))
-
     print("Total rows in df after read:", len(df.index))
 
     def has_no_strange_chars_regex(s):
@@ -43,6 +42,11 @@ def main():
     print("Shape before filtering strange characters:", df.shape)
     df = df[df['content'].apply(has_no_strange_chars_regex)]
     print("Shape after filtering strange characters:", df.shape)
+
+    # Deduplicate texts
+    print("Shape before de-duplicate:", df.shape)
+    df = df.drop_duplicates(subset="content")
+    print("Shape after de-duplicate:", df.shape)
 
     # Loading in (pre-trained) model(s)
     # TODO generalise embedding/prompting code to serve as generic interface 

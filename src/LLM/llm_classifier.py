@@ -18,6 +18,7 @@ def create_classification_model(config, pretrained=True):
         case "SVM_rbf":
             model = SVC(kernel="rbf")
             if pretrained:
+                # We use joblib for loading pkls
                 model = joblib.load(config.llm.embedding.classifier_path)
                 print(f"Loaded weights for {config.llm.embedding.classifier} classifier")
             return model
