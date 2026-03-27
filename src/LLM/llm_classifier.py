@@ -31,7 +31,6 @@ def classify_prompt(config, extracted_text, variable):
     return 1 if prompt_LLM(config, extracted_text, variable) == "Yes" else 0
 
 
-# TODO restructure code to process in batches
 def classify_embedding(config, extracted_text, models):
     embedding = embed_text(models["embedding"], extracted_text)
     prediction = models["classification"].predict(embedding)

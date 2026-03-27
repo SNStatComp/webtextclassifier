@@ -15,6 +15,7 @@ llm:
   embedding:
     model: 
     model_weights: 
+    max_nchar: 
     dim: 
     classifier: 
     classifier_path: 
@@ -27,3 +28,4 @@ input:
 output:
   output_dir: output
 seed:
+batchsize:
