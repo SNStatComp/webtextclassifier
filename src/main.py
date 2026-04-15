@@ -30,10 +30,10 @@ def main():
     # TODO lazy reading to deal with large dataset 
     print("-" * 33, "LOADING IN DATA", "-" * 33)
     df = pd.read_parquet(os.path.join(config.input.input_dir, config.input.input_file))
-    df = df.iloc[:1]
     print("Total rows in df after read:", len(df.index))
 
     # Clean up input data
+    # Remove strange characters
     def has_no_strange_chars_regex(s):
         if pd.isna(s) or len(s) == 0:
             return False  # or handle NaN as needed
@@ -41,7 +41,7 @@ def main():
         strange_chars = re.findall(r'[\x00-\x08\x0B\x0E-\x1F\x7F]', str(s))
         return not (len(strange_chars) / len(s)) > 0.1 
 
-    # Filter rows
+    # Filter rows on strange chars
     print("Shape before filtering strange characters:", df.shape)
     df = df[df['content'].apply(has_no_strange_chars_regex)]
     print("Shape after filtering strange characters:", df.shape)
@@ -56,16 +56,18 @@ def main():
     if config.llm.method == "embedding":
         models["embedding"] = create_model(config, "embedder")
         models["classification"] = create_model(config, "classifier")
-
+    else:
+        ...  # add methods
     print("-" * 33, f"CLASSIFICATION ({config.llm.method})", "-" * 33)
+
     # Classification
     # batch-wise due to compute constraints, see config for batch size
-    # Create empty column and fill it up iteratively
+    # Create empty column for label and fill it up iteratively
     df["OJA_label"] = "-1"
     start_row = 0
     start_time = time.time()
 
-    # We cannot embed texts that are too long due to GPU memory limitations
+    # We skip texts that are too long due to memory limits
     def is_too_long(s):
         if pd.isna(s):
             return True
@@ -74,16 +76,17 @@ def main():
     # Mark long rows and assign default label 0
     df["too_long"] = df["content"].apply(is_too_long)
     df.loc[df["too_long"], "OJA_label"] = "0"
+
+    # Iteratively assign labels to rows
     while start_row < len(df.index):
         end_row = min(start_row + config.batchsize, len(df.index))
         batch_idx = df.index[start_row:end_row]
 
         print(
-            f"""
-            Working on rows: {start_row}:{min(end_row, len(df.index))} out of {len(df.index)},
-             iter/s={start_row / (time.time() - start_time)},
-             mean nchar of text: {np.mean(df.loc[df.index[start_row:end_row], "content"].apply(len))}
-            """, end="\r"
+            (f"Working on rows: {start_row}:{min(end_row, len(df.index))} out of {len(df.index)}",
+             f"iter/s={start_row / (time.time() - start_time)}",
+             f"mean nchar of text: {np.mean(df.loc[df.index[start_row:end_row], "content"].apply(len))}"
+            ), end="\r"
         )
 
         # Filter out long texts from this batch
@@ -93,14 +96,14 @@ def main():
 
         # Classify remaining texts in batch
         if len(short_idx) > 0:
-            selected_text = batch_df.loc[short_idx, "content"].reset_index(drop=True)
             # classify only short texts
+            selected_text = batch_df.loc[short_idx, "content"].reset_index(drop=True)
             labels = classify(config, selected_text, models=models)
 
-            # Write labels back to the right rows
+            # Add labels
             df.loc[short_idx, "OJA_label"] = labels
 
-        # too_long rows in this batch already have label 0 set above
+        # Start next iter on next batch
         start_row += config.batchsize
 
         torch.cuda.empty_cache()

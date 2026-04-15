@@ -18,7 +18,7 @@ llm:
     max_nchar: 
     dim: 
     classifier: 
-    classifier_path: 
+    classifier_weights: 
 requests:
   timeout: 60
   default_language: English
