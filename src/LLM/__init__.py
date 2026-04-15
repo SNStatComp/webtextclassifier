@@ -7,7 +7,10 @@ import warnings
 def create_model(config, model_type):
     match model_type:
         case "embedder":
-            return create_embedding_model(config)
+            if (config.llm.embedding.model_weights is not None):
+                return create_embedding_model(config, local=True)
+            else:
+                return create_embedding_model(config)
         case "classifier":
             return create_classification_model(config)
         case _:

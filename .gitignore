@@ -68,3 +68,5 @@ input/*
 
 # config files need to be explicitly added 
 config/*
+*.json
+*.yaml

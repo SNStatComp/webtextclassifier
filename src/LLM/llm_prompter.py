@@ -1,13 +1,14 @@
 import openai
 
 
+# Method to prompt openai api model
 def prompt_LLM(config, extracted_text="", variable=None):
     client = openai.OpenAI(
         api_key=config.llm.prompt.api_key,
         base_url=config.llm.prompt.api_url
     )
 
-    prompt_content = f"{extracted_text}, does the above-mentioned text, relating to a web-page, contain text with its main content about: {variable}?"
+    prompt_content = f"{extracted_text}, Would you say that the above-given text that was taken from a web-page relates mainly in its content to: {variable}? Reply only with either Yes or No"
 
     response = client.chat.completions.create(
         model = config.llm.prompt.model,
