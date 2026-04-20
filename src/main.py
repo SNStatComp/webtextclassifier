@@ -1,10 +1,8 @@
-import s3fs
-import json
 import random
 import pandas as pd
 import numpy as np
 import datetime
-import os 
+import os
 import time
 import re
 import torch
@@ -16,7 +14,7 @@ from LLM import create_model, classify
 def main():
     # Turn off torch grad to save resources
     torch.set_grad_enabled(False)
-    
+
     # Load config
     print("-" * 33, "LOADING CONFIG", "-" * 33)
     config = setup("config/config.yaml")
@@ -27,7 +25,7 @@ def main():
     print(OmegaConf.to_yaml(config))
 
     # Read text data
-    # TODO lazy reading to deal with large dataset 
+    # TODO lazy reading to deal with large dataset
     print("-" * 33, "LOADING IN DATA", "-" * 33)
     df = pd.read_parquet(os.path.join(config.input.input_dir, config.input.input_file))
     print("Total rows in df after read:", len(df.index))
@@ -56,6 +54,10 @@ def main():
     if config.llm.method == "embedding":
         models["embedding"] = create_model(config, "embedder")
         models["classification"] = create_model(config, "classifier")
+    elif config.llm.method == "prompt":
+        # Cannot do prompts in parallel?
+        config.batchsize = 1
+        models["prompt_client"] = create_model(config, "prompt")
     else:
         ...  # add methods
     print("-" * 33, f"CLASSIFICATION ({config.llm.method})", "-" * 33)
@@ -113,12 +115,12 @@ def main():
     # Final logging
     print("df:", df.head(5))
     print("Total rows in df:", len(df.index))
-    print("# Rows too long:", df["too_long"].value_counts())
-    print("Value counts labels:", df["OJA_label"].value_counts())
+    print("# Rows too long:\n", df["too_long"].value_counts())
+    print("Value counts labels:\n", df["OJA_label"].value_counts())
 
     # Save output
     print(f"Writing output to: output_{datetime.datetime.now()}.parquet")
-    df.to_parquet(os.path.join(config.output.output_dir, f"output_{datetime.datetime.now()}.parquet"))
+    df.to_parquet(os.path.join(config.output.output_dir, f"output_{config.llm.method}_{datetime.datetime.now()}.parquet"))
 
 
 if __name__ == "__main__":

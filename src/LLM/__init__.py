@@ -1,5 +1,6 @@
 from .llm_classifier import create_classification_model, classify_prompt, classify_embedding
 from .llm_embedder import create_embedding_model
+from .llm_prompter import create_client
 import warnings
 
 
@@ -13,6 +14,8 @@ def create_model(config, model_type):
                 return create_embedding_model(config)
         case "classifier":
             return create_classification_model(config)
+        case "prompt":
+            return create_client(config)
         case _:
             warnings.warn(f"Model type {model_type} has no defined model creation method!")
             return None
@@ -22,7 +25,7 @@ def create_model(config, model_type):
 def classify(config, extracted_text, variable=None, models=None):
     match config.llm.method:
         case "prompt":
-            return classify_prompt(config, extracted_text, variable)
+            return classify_prompt(config, models["prompt_client"], extracted_text, variable)
         case "embedding":
             return classify_embedding(config, extracted_text, models)
         case _:

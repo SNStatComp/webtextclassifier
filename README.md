@@ -6,8 +6,10 @@ This repo is part of the WEB-FOSS-NL project on statistical scraping.
 More info on statistical scraping [here](https://github.com/SNStatComp/SSIG) 
 
 # Getting started
-- Install all required packages using 
+- Install all required packages using pip or uv
     > pip install -r requirements.txt
+    or
+    > uv pip install -r requirements.txt
 - Create a `config.yaml` file using `config_template.yaml`
 - Place your input file with URLs according to your input configuration
 - Configure your variables in the configured input file
