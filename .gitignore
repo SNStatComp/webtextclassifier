@@ -70,3 +70,6 @@ input/*
 config/*
 *.json
 *.yaml
+
+# Model files
+model/*
