@@ -28,9 +28,10 @@ def create_classification_model(config, pretrained=True):
 
 
 # Interface method to classify using prompt method
-def classify_prompt(config, extracted_text, variable):
+def classify_prompt(config, client, extracted_text, variable):
     # For now, just prompt the llm
-    return 1 if prompt_LLM(config, extracted_text, variable) == "Yes" else 0
+    response = prompt_LLM(config, client, extracted_text, variable)
+    return "1" if response == "Yes" else "0"
 
 
 # Interace method to classify using embedding method
