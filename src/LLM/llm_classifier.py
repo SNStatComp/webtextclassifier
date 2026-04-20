@@ -1,9 +1,9 @@
 from .llm_prompter import prompt_LLM
 from .llm_embedder import embed_text
-import warnings
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 import joblib
+import warnings
 
 
 # Create model object for classifier
