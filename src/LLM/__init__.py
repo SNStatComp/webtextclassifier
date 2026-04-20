@@ -29,4 +29,5 @@ def classify(config, extracted_text, variable=None, models=None):
         case "embedding":
             return classify_embedding(config, extracted_text, models)
         case _:
-            raise Exception(f"Unspecified method for classification: {config.llm.method}")
+            warnings.warn(f"Unspecified method for classification: {config.llm.method}")
+            return None
